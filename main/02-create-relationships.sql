@@ -56,7 +56,7 @@ ADD
 ADD
     COLUMN analista_id INT,
 ADD
-    CONSTRAINT fk_curso_unidade_ensino FOREIGN KEY (unidade_ensino_id) REFERENCES unidade_ensino(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_curso_unidade_ensino FOREIGN KEY (unidade_ensino_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE,
 ADD
     CONSTRAINT fk_curso_analista FOREIGN KEY (analista_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 

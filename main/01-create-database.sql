@@ -80,7 +80,7 @@ CREATE TABLE curso (
     nome VARCHAR(100) NOT NULL UNIQUE,
     descricao TEXT,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em DATETIME,
+    atualizado_em DATETIME
 );
 
 -- Turma
@@ -90,7 +90,7 @@ CREATE TABLE turma (
     descricao TEXT,
     periodo ENUM('MATUTINO', 'VESPERTINO', 'NOTURNO'),
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em DATETIME,
+    atualizado_em DATETIME
 );
 
 -- Denúncia
