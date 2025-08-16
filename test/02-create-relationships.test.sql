@@ -20,7 +20,7 @@ ADD
 ALTER TABLE
     usuario_aluno
 ADD
-    COLUMN usuario_id INT PRIMARY KEY,
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
 ADD
     CONSTRAINT fk_usuario_aluno_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -28,7 +28,7 @@ ADD
 ALTER TABLE
     usuario_pedagogo
 ADD
-    COLUMN usuario_id INT PRIMARY KEY,
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
 ADD
     CONSTRAINT fk_usuario_pedagogo_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -36,7 +36,7 @@ ADD
 ALTER TABLE
     usuario_analista
 ADD
-    COLUMN usuario_id INT PRIMARY KEY,
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
 ADD
     CONSTRAINT fk_usuario_analista_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -44,7 +44,7 @@ ADD
 ALTER TABLE
     usuario_unidade_ensino
 ADD
-    COLUMN usuario_id INT PRIMARY KEY,
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
 ADD
     CONSTRAINT fk_usuario_unidade_ensino_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
