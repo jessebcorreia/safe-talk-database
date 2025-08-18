@@ -47,7 +47,7 @@ CREATE TABLE usuario_aluno (
     nome VARCHAR(100),
     sobrenome VARCHAR(100),
     cpf CHAR(14) UNIQUE,
-    sexo ENUM('M', 'F')
+    sexo ENUM('MASCULINO', 'FEMININO')
 );
 
 -- Usuário/Aluno (chave primária compartilhada - criada depois)
@@ -55,7 +55,7 @@ CREATE TABLE usuario_pedagogo (
     nome VARCHAR(100),
     sobrenome VARCHAR(100),
     cpf CHAR(14) UNIQUE,
-    sexo ENUM('M', 'F')
+    sexo ENUM('MASCULINO', 'FEMININO')
 );
 
 -- Usuário/Aluno (chave primária compartilhada - criada depois)
@@ -63,7 +63,7 @@ CREATE TABLE usuario_analista (
     nome VARCHAR(100),
     sobrenome VARCHAR(100),
     cpf CHAR(14) UNIQUE,
-    sexo ENUM('M', 'F')
+    sexo ENUM('MASCULINO', 'FEMININO')
 );
 
 -- Usuário/Unidade de Ensino (chave primária compartilhada - criada depois)
