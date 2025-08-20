@@ -14,14 +14,14 @@ INSERT INTO
     usuario_analista (usuario_id, nome, sobrenome, cpf, sexo)
 VALUES
     -- usuario_id: 2
-    (2, 'João', 'Analista da Silva', '861.534.872-92', 'M'),
+    (2, 'João', 'Analista da Silva', '861.534.872-92', 'Masculino'),
     -- usuario_id: 3
-    (3, 'Maria', 'Pereira Analista da Costa', '845.269.456-15', 'F');
+    (3, 'Maria', 'Pereira Analista da Costa', '845.269.456-15', 'Feminino');
 
 INSERT INTO
     usuario_pedagogo (usuario_id, nome, sobrenome, cpf, sexo)
 VALUES
     -- usuario_id: 4
-    (4, 'Josicleison', 'o Pedagogo', '563.534.856-92', 'M'),
+    (4, 'Josicleison', 'o Pedagogo', '563.534.856-92', 'Masculino'),
     -- usuario_id: 5
-    (5, 'Luana', 'Andrade Pedagoga Santos', '379.568.339-56', 'F');
+    (5, 'Luana', 'Andrade Pedagoga Santos', '379.568.339-56', 'Feminino');
