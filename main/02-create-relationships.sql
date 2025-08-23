@@ -22,7 +22,11 @@ ALTER TABLE
 ADD
     COLUMN usuario_id INT PRIMARY KEY FIRST,
 ADD
-    CONSTRAINT fk_usuario_aluno_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
+    COLUMN turma_id INT,
+ADD
+    CONSTRAINT fk_usuario_aluno_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_usuario_aluno_turma FOREIGN KEY (turma_id) REFERENCES turma(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- Usuário/Pedagogo (Chave primária compartilhada)
 ALTER TABLE
