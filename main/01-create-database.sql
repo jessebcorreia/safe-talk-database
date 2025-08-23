@@ -103,8 +103,14 @@ CREATE TABLE denuncia (
         'VIOLENCIA_VERBAL',
         'CYBER_BULLYING'
     ) NOT NULL,
+    situacao_analise ENUM(
+        'NAO_INICIADA',
+        'INICIADA',
+        'ENCERRADA'
+    ) NOT NULL,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em DATETIME
+    atualizado_em DATETIME,
+    encerrado_em DATETIME
 );
 
 -- Andamento
