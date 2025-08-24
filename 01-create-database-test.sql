@@ -129,7 +129,6 @@ CREATE TABLE andamento (
     ) 
 );
 
-
 USE safe_talk;
 
 -- Responsável
@@ -216,11 +215,15 @@ ADD
 ADD
     COLUMN autor_id INT ,
 ADD
+    COLUMN pedagogo_id INT ,
+ADD
     COLUMN analista_id INT ,
 ADD
     CONSTRAINT fk_denuncia_local_fato FOREIGN KEY (local_fato_id) REFERENCES endereco(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 ADD
     CONSTRAINT fk_denuncia_autor FOREIGN KEY (autor_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_denuncia_pedagogo FOREIGN KEY (pedagogo_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 ADD
     CONSTRAINT fk_denuncia_analista FOREIGN KEY (analista_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -232,16 +235,6 @@ CREATE TABLE denuncia_vitima (
     PRIMARY KEY (denuncia_id, vitima_id),
     CONSTRAINT fk_denuncia_vitima_denuncia FOREIGN KEY (denuncia_id) REFERENCES denuncia(id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_denuncia_vitima_vitima FOREIGN KEY (vitima_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- Denúncia/Agressores (N:N)
--- Uma denúncia pode ter vários agressores, e um usuário pode ser agressor em várias denúncias
-CREATE TABLE denuncia_agressor (
-    denuncia_id INT ,
-    agressor_id INT ,
-    PRIMARY KEY (denuncia_id, agressor_id),
-    CONSTRAINT fk_denuncia_agressor_denuncia FOREIGN KEY (denuncia_id) REFERENCES denuncia(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT fk_denuncia_agressor_agressor FOREIGN KEY (agressor_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Denúncia/Pedagogos (N:N)

@@ -1,5 +1,5 @@
 INSERT INTO denuncia
-    (nome, descricao, periodo, curso_id, pedagogo_id)
+    (titulo, conteudo, tipo, situacao_analise, criado_em, atualizado_em, local_fato_id, autor_id, analista_id)
 VALUES
     -- Curso 1: Informática Básica
     ('Info Básica - Turma A', 'Introdução ao uso do computador e do sistema operacional.', 'MATUTINO', 1, 3),
