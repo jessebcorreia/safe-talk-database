@@ -1,3 +1,315 @@
+DROP DATABASE IF EXISTS safe_talk;
+
+CREATE DATABASE safe_talk CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE safe_talk;
+
+-- Endereço
+CREATE TABLE endereco (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    logradouro VARCHAR(150) NOT NULL,
+    numero VARCHAR(20),
+    complemento VARCHAR(100),
+    bairro VARCHAR(100),
+    cidade VARCHAR(100) NOT NULL,
+    estado CHAR(2) NOT NULL,
+    cep CHAR(9) NOT NULL,
+    pais VARCHAR(50) NOT NULL
+);
+
+-- Responsável
+CREATE TABLE responsavel (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    sobrenome VARCHAR(100) NOT NULL,
+    cpf CHAR(14) NOT NULL UNIQUE,
+    telefone VARCHAR(20),
+    parentesco ENUM('PAI', 'MAE', 'TUTOR', 'OUTRO') NOT NULL
+);
+
+-- Usuário
+CREATE TABLE usuario (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME,
+    cargo ENUM(
+        'UNIDADE_ENSINO',
+        'ANALISTA',
+        'PEDAGOGO',
+        'ALUNO'
+    )
+);
+
+-- Usuário/Aluno (chave primária compartilhada - criada depois)
+CREATE TABLE usuario_aluno (
+    nome VARCHAR(100) NOT NULL,
+    sobrenome VARCHAR(100) NOT NULL,
+    cpf CHAR(14) NOT NULL UNIQUE,
+    sexo ENUM('MASCULINO', 'FEMININO') NOT NULL
+);
+
+-- Usuário/Aluno (chave primária compartilhada - criada depois)
+CREATE TABLE usuario_pedagogo (
+    nome VARCHAR(100) NOT NULL,
+    sobrenome VARCHAR(100) NOT NULL,
+    cpf CHAR(14) NOT NULL UNIQUE,
+    sexo ENUM('MASCULINO', 'FEMININO') NOT NULL
+);
+
+-- Usuário/Aluno (chave primária compartilhada - criada depois)
+CREATE TABLE usuario_analista (
+    nome VARCHAR(100) NOT NULL,
+    sobrenome VARCHAR(100) NOT NULL,
+    cpf CHAR(14) NOT NULL UNIQUE,
+    sexo ENUM('MASCULINO', 'FEMININO') NOT NULL
+);
+
+-- Usuário/Unidade de Ensino (chave primária compartilhada - criada depois)
+CREATE TABLE usuario_unidade_ensino (
+    nome_fantasia VARCHAR(100) NOT NULL,
+    razao_social VARCHAR(100),
+    cnpj CHAR(18) NOT NULL UNIQUE,
+    descricao TEXT
+);
+
+-- Curso
+CREATE TABLE curso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    descricao TEXT,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME
+);
+
+-- Turma
+CREATE TABLE turma (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE,
+    descricao TEXT,
+    periodo ENUM('MATUTINO', 'VESPERTINO', 'NOTURNO'),
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME
+);
+
+-- Denúncia
+CREATE TABLE denuncia (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(150) NOT NULL,
+    conteudo TEXT NOT NULL,
+    tipo ENUM(
+        'VIOLENCIA_FISICA',
+        'VIOLENCIA_VERBAL',
+        'CYBER_BULLYING'
+    ) NOT NULL,
+    situacao_analise ENUM(
+        'NAO_INICIADA',
+        'INICIADA',
+        'ENCERRADA'
+    ) NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME,
+    encerrado_em DATETIME
+);
+
+-- Andamento
+CREATE TABLE andamento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    conteudo TEXT NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tipo ENUM(
+        'ARQUIVAMENTO',
+        'DESARQUIVAMENTO',
+        'PARECER_FINAL',
+        'INFORMACAO_COMPLEMENTAR',
+        'ANALISE',
+        'REUNIAO',
+        'OBSERVACAO'
+    ) NOT NULL
+);
+
+
+USE safe_talk;
+
+-- Responsável
+ALTER TABLE
+    responsavel
+ADD
+    COLUMN aluno_id INT NOT NULL,
+ADD
+    CONSTRAINT fk_responsavel_aluno FOREIGN KEY (aluno_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Usuário
+ALTER TABLE
+    usuario
+ADD
+    COLUMN endereco_id INT NOT NULL,
+ADD
+    CONSTRAINT fk_usuario_endereco FOREIGN KEY (endereco_id) REFERENCES endereco(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Usuário/Aluno (Chave primária compartilhada)
+ALTER TABLE
+    usuario_aluno
+ADD
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
+ADD
+    COLUMN turma_id INT,
+ADD
+    CONSTRAINT fk_usuario_aluno_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_usuario_aluno_turma FOREIGN KEY (turma_id) REFERENCES turma(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Usuário/Pedagogo (Chave primária compartilhada)
+ALTER TABLE
+    usuario_pedagogo
+ADD
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
+ADD
+    CONSTRAINT fk_usuario_pedagogo_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Usuário/Analista (Chave primária compartilhada)
+ALTER TABLE
+    usuario_analista
+ADD
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
+ADD
+    CONSTRAINT fk_usuario_analista_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Usuário/Unidade de Ensino (Chave primária compartilhada)
+ALTER TABLE
+    usuario_unidade_ensino
+ADD
+    COLUMN usuario_id INT PRIMARY KEY FIRST,
+ADD
+    CONSTRAINT fk_usuario_unidade_ensino_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Curso
+ALTER TABLE
+    curso
+ADD
+    COLUMN unidade_ensino_id INT NOT NULL,
+ADD
+    COLUMN analista_id INT,
+ADD
+    CONSTRAINT fk_curso_unidade_ensino FOREIGN KEY (unidade_ensino_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_curso_analista FOREIGN KEY (analista_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Turma
+ALTER TABLE
+    turma
+ADD
+    COLUMN curso_id INT NOT NULL,
+ADD
+    COLUMN pedagogo_id INT,
+ADD
+    CONSTRAINT fk_turma_curso FOREIGN KEY (curso_id) REFERENCES curso(id) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_turma_pedagogo FOREIGN KEY (pedagogo_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Denúncia
+ALTER TABLE
+    denuncia
+ADD
+    COLUMN local_fato_id INT,
+ADD
+    COLUMN autor_id INT NOT NULL,
+ADD
+    COLUMN pedagogo_id INT NOT NULL,
+ADD
+    COLUMN analista_id INT NOT NULL,
+ADD
+    CONSTRAINT fk_denuncia_local_fato FOREIGN KEY (local_fato_id) REFERENCES endereco(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_denuncia_autor FOREIGN KEY (autor_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_denuncia_pedagogo FOREIGN KEY (pedagogo_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_denuncia_analista FOREIGN KEY (analista_id) REFERENCES usuario(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Denúncia/Vítimas (N:N)
+-- Uma denúncia pode ter várias vítimas, e um usuário pode ser vítima em várias denúncias
+CREATE TABLE denuncia_vitima (
+    denuncia_id INT NOT NULL,
+    vitima_id INT NOT NULL,
+    PRIMARY KEY (denuncia_id, vitima_id),
+    CONSTRAINT fk_denuncia_vitima_denuncia FOREIGN KEY (denuncia_id) REFERENCES denuncia(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_denuncia_vitima_vitima FOREIGN KEY (vitima_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Denúncia/Agressores (N:N)
+-- Uma denúncia pode ter várias vítimas, e um usuário pode ser vítima em várias denúncias
+CREATE TABLE denuncia_agressor (
+    denuncia_id INT NOT NULL,
+    agressor_id INT NOT NULL,
+    PRIMARY KEY (denuncia_id, agressor_id),
+    CONSTRAINT fk_denuncia_agressor_denuncia FOREIGN KEY (denuncia_id) REFERENCES denuncia(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_denuncia_agressor_agressor FOREIGN KEY (agressor_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Andamento
+ALTER TABLE
+    andamento
+ADD
+    COLUMN denuncia_id INT NOT NULL,
+ADD
+    COLUMN autor_id INT NOT NULL,
+ADD
+    CONSTRAINT fk_andamento_denuncia FOREIGN KEY (denuncia_id) REFERENCES denuncia(id) ON DELETE CASCADE ON UPDATE CASCADE,
+ADD
+    CONSTRAINT fk_andamento_autor FOREIGN KEY (autor_id) REFERENCES usuario(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Andamento/Arquivamento (1:1)
+-- Se o andamento for do tipo "ARQUIVAMENTO", as informações complementares ficarão nessa tabela
+CREATE TABLE andamento_arquivamento (
+    andamento_id INT PRIMARY KEY,
+    motivo ENUM(
+        'DENUNCIA_DUPLICADA',
+        'DENUNCIA_INCOMPLETA',
+        'FATO_JA_APURADO',
+        'FATO_ATIPICO'
+    ) NOT NULL,
+    CONSTRAINT fk_andamento_arquivamento_andamento FOREIGN KEY (andamento_id) REFERENCES andamento(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Andamento/Desarquivamento (1:1)
+-- Se o andamento for do tipo "DESARQUIVAMENTO", as informações complementares ficarão nessa tabela
+CREATE TABLE andamento_desarquivamento (
+    andamento_id INT PRIMARY KEY,
+    motivo ENUM('NOVAS_INFORMACOES', 'REVISAO_DA_DENUNCIA') NOT NULL,
+    CONSTRAINT fk_andamento_desarquivamento_andamento FOREIGN KEY (andamento_id) REFERENCES andamento(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Andamento/Análise (1:1)
+-- Se o andamento for do tipo "ANALISE", as informações complementares ficarão nessa tabela
+CREATE TABLE andamento_analise (
+    andamento_id INT PRIMARY KEY,
+    atualizado_em DATETIME,
+    CONSTRAINT fk_andamento_analise_andamento FOREIGN KEY (andamento_id) REFERENCES andamento(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Andamento/Reunião (1:1)
+-- Se o andamento for do tipo "REUNIAO", as informações complementares ficarão nessa tabela
+CREATE TABLE andamento_reuniao (
+    andamento_id INT PRIMARY KEY,
+    data_hora DATETIME NOT NULL,
+    CONSTRAINT fk_andamento_reuniao_andamento FOREIGN KEY (andamento_id) REFERENCES andamento(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Andamento/Parecer Final (1:1)
+-- Se o andamento for do tipo "PARECER_FINAL", as informações complementares ficarão nessa tabela
+CREATE TABLE andamento_parecer_final (
+    andamento_id INT PRIMARY KEY,
+    resultado ENUM(
+        'DENUNCIA_PROCEDENTE',
+        'DENUNCIA_IMPROCEDENTE',
+        'PARECER_INCONCLUSIVO'
+    ) NOT NULL,
+    atualizado_em DATETIME,
+    CONSTRAINT fk_andamento_parecer_final_andamento FOREIGN KEY (andamento_id) REFERENCES andamento(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 USE safe_talk;
 
 INSERT INTO
@@ -15,7 +327,7 @@ VALUES
     ('Rua Caminho do Rio', 398, 'Casa 1', 'Bosque Encantado', 'Blumenau', 'SC', '89065-258', 'Brasil');
 
 
-  INSERT INTO
+INSERT INTO
     usuario (email, senha, cargo, endereco_id)
 VALUES
     -- id: 1
@@ -57,7 +369,6 @@ VALUES
     (5, 'Luana', 'Andrade Pedagoga Santos', '379.568.339-56', 'Feminino');
 
 
-
 INSERT INTO curso
     (nome, descricao, unidade_ensino_id, analista_id)
 VALUES
@@ -65,7 +376,6 @@ VALUES
     ('Inglês Intermediário', 'Curso de língua inglesa com foco em conversação e vocabulário para o dia a dia.', 1, 2),
     ('Matemática Aplicada', 'Curso para reforço escolar e aplicação prática de conceitos matemáticos.', 1, 3),
     ('Educação Artística', 'Curso voltado ao desenvolvimento criativo por meio de desenho, pintura e trabalhos manuais.', 1, 3);
-
 
 
 INSERT INTO turma
@@ -98,7 +408,6 @@ VALUES
     ('Ed Artística - Turma C', 'Artesanato e trabalhos manuais criativos.', 'NOTURNO', 4, 4),
     ('Ed Artística - Turma D', 'História da arte e inspiração criativa.', 'MATUTINO', 4, 4),
     ('Ed Artística - Turma E', 'Projeto final com exposição das obras.', 'VESPERTINO', 4, 4);
-
 
 
 INSERT INTO
@@ -508,3 +817,40 @@ VALUES
 (203, 'Luiz Henrique', 'Pereira', '797.416.329-63', 'MASCULINO', '20'),
 (204, 'Dominique', 'Azevedo', '175.931.589-82', 'FEMININO', '20'),
 (205, 'Beatriz', 'Almeida', '855.952.184-53', 'FEMININO', '20');
+
+
+INSERT INTO denuncia
+    (titulo, conteudo, tipo, situacao_analise, local_fato_id, autor_id, pedagogo_id, analista_id)
+VALUES
+    -- Alunos: ids 6 a 205
+    -- Analistas: ids 2 e 3
+    -- Pedagogos: ids 4 e 5
+
+    -- id: 1
+    ('Briga no intervalo', 'Durante o recreio eu fui empurrado e levei socos de dois colegas.', 'VIOLENCIA_FISICA', 'NAO_INICIADA', 1, 15, 4, 2),
+    -- id: 2
+    ('Ameaças no corredor', 'Um aluno me disse que iria me bater depois da aula e fiquei com medo.', 'VIOLENCIA_VERBAL', 'NAO_INICIADA', 2, 8, 4, 2),
+    -- id: 3
+    ('Mensagens ofensivas no WhatsApp', 'Eu e um colega estamos recebendo xingamentos e piadas em um grupo da turma.', 'CYBER_BULLYING', 'INICIADA', 3, 8, 5, 3);
+
+INSERT INTO denuncia_vitima
+    (denuncia_id, vitima_id)
+VALUES
+    (1, 103),
+    (2, 165),
+    (3, 200),
+    (3, 201);
+
+INSERT INTO denuncia_agressor
+    (denuncia_id, agressor_id)
+VALUES
+    (1, 30),
+    (1, 32),
+
+    (2, 45),
+
+    (3, 75),
+    (2, 52),
+    (2, 57),
+    (2, 58),
+    (2, 65);
